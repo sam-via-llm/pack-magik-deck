@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pack Magik Due Diligence | Multi-Feature Analysis</title>
+    <title>Pack Magik Due Diligence | Full Scenario Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
             --bg-dark: #0a0a0f;
@@ -37,551 +33,126 @@
             overflow-x: hidden;
         }
         
-        .slide {
-            display: none;
-            min-height: 100vh;
-            padding: 40px 60px 100px 60px;
-            animation: fadeIn 0.5s ease;
-        }
+        .slide { display: none; min-height: 100vh; padding: 40px 60px 100px 60px; animation: fadeIn 0.5s ease; }
+        .slide.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .slide.active {
-            display: block;
-        }
+        .nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; background: var(--bg-card); padding: 10px 16px; border-radius: 50px; border: 1px solid var(--border); z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.3s; }
+        .nav-dot:hover { background: var(--text-muted); transform: scale(1.2); }
+        .nav-dot.active { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .nav-arrows { position: fixed; bottom: 30px; right: 40px; display: flex; gap: 10px; z-index: 1000; }
+        .nav-arrow { width: 50px; height: 50px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); font-size: 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .nav-arrow:hover { background: var(--bg-card-hover); border-color: var(--accent); }
         
-        .nav {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            background: var(--bg-card);
-            padding: 12px 20px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
+        .slide-counter { position: fixed; top: 30px; right: 40px; font-size: 14px; color: var(--text-muted); background: var(--bg-card); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
+        .slide-title { position: fixed; top: 30px; left: 40px; font-size: 14px; color: var(--text-muted); background: var(--bg-card); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
         
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--border);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 10px; background: linear-gradient(135deg, var(--text) 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        h2 { font-size: 1.7rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+        h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; color: var(--text-muted); }
+        .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 25px; }
         
-        .nav-dot:hover {
-            background: var(--text-muted);
-            transform: scale(1.2);
-        }
+        .hero { text-align: center; padding-top: 60px; }
+        .hero-stats { display: flex; justify-content: center; gap: 24px; margin-top: 35px; flex-wrap: wrap; }
+        .hero-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 26px; text-align: center; }
+        .hero-stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent-light); }
+        .hero-stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
         
-        .nav-dot.active {
-            background: var(--accent);
-            box-shadow: 0 0 12px var(--accent);
-        }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
         
-        .nav-arrows {
-            position: fixed;
-            bottom: 30px;
-            right: 40px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
+        @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
         
-        .nav-arrow {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: all 0.3s; }
+        .card:hover { border-color: rgba(99, 102, 241, 0.3); }
         
-        .nav-arrow:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent);
-        }
+        .metric { text-align: center; padding: 18px 14px; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         
-        .slide-counter {
-            position: fixed;
-            top: 30px;
-            right: 40px;
-            font-size: 14px;
-            color: var(--text-muted);
-            background: var(--bg-card);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-        }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
+        .feature-card.highlight { border-color: var(--success); box-shadow: 0 0 25px rgba(16, 185, 129, 0.1); }
+        .feature-card.warning { border-color: var(--warning); }
+        .feature-card.danger { border-color: var(--danger); }
         
-        .slide-title {
-            position: fixed;
-            top: 30px;
-            left: 40px;
-            font-size: 14px;
-            color: var(--text-muted);
-            background: var(--bg-card);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-        }
-        
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--text) 0%, var(--accent-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text);
-        }
-        
-        h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-muted);
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-        }
-        
-        .hero {
-            text-align: center;
-            padding-top: 80px;
-        }
-        
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .hero-stat {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px 30px;
-            text-align: center;
-        }
-        
-        .hero-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-light);
-        }
-        
-        .hero-stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
-        }
-        
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        
-        @media (max-width: 1200px) {
-            .grid-4 { grid-template-columns: repeat(2, 1fr); }
-        }
-        
-        @media (max-width: 900px) {
-            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-        }
-        
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s;
-        }
-        
-        .card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-        
-        .metric {
-            text-align: center;
-            padding: 20px 16px;
-        }
-        
-        .metric-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-        
-        .metric-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .feature-card.highlight {
-            border-color: var(--success);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.1);
-        }
-        
-        .feature-card.warning {
-            border-color: var(--warning);
-        }
-        
-        .feature-card.danger {
-            border-color: var(--danger);
-        }
-        
-        .feature-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
+        .feature-badge { position: absolute; top: 14px; right: 14px; padding: 3px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 600; }
         .badge-strong { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .badge-moderate { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .badge-weak { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
         
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 12px;
-        }
+        .feature-icon { font-size: 1.8rem; margin-bottom: 10px; }
+        .feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+        .feature-metrics { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+        .feature-metric { display: flex; justify-content: space-between; font-size: 0.85rem; }
+        .feature-metric-label { color: var(--text-muted); }
+        .feature-metric-value { font-weight: 600; }
         
-        .feature-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
+        .chart-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; height: 320px; }
         
-        .feature-metrics {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 16px;
-        }
+        .explanation-box { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 10px; padding: 14px 18px; margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); }
+        .explanation-box strong { color: var(--accent-light); }
+        .explanation-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); }
+        .explanation-box.warning strong { color: var(--warning); }
+        .explanation-box.danger { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+        .explanation-box.danger strong { color: var(--danger); }
         
-        .feature-metric {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
+        .table-simple { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .table-simple th, .table-simple td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        .table-simple th { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; }
+        .table-simple td { font-size: 0.85rem; }
         
-        .feature-metric-label {
-            color: var(--text-muted);
-        }
+        .scenario-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+        .scenario-card h4 { font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .scenario-metric { font-size: 1.8rem; font-weight: 700; margin: 14px 0; }
+        .scenario-details { font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
         
-        .feature-metric-value {
-            font-weight: 600;
-        }
+        .verdict-box { text-align: center; padding: 35px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); border-radius: 18px; border: 1px solid var(--border); margin-top: 25px; }
+        .verdict-emoji { font-size: 3.5rem; margin-bottom: 14px; }
+        .verdict-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; }
+        .verdict-subtitle { font-size: 1rem; color: var(--text-muted); margin-bottom: 20px; }
         
-        .chart-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            height: 350px;
-        }
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 750px; margin: 0 auto; text-align: left; }
+        .action-item { display: flex; align-items: flex-start; gap: 10px; padding: 14px; background: var(--bg-card); border-radius: 10px; }
+        .action-number { width: 26px; height: 26px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
         
-        .explanation-box {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        
-        .explanation-box strong {
-            color: var(--accent-light);
-        }
-        
-        .scenario-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-        }
-        
-        .scenario-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .scenario-metric {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 16px 0;
-        }
-        
-        .scenario-details {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.8;
-        }
-        
-        .verdict-box {
-            text-align: center;
-            padding: 40px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            margin-top: 30px;
-        }
-        
-        .verdict-emoji {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-        
-        .verdict-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        
-        .verdict-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-        
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-        }
-        
-        .action-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 16px;
-            background: var(--bg-card);
-            border-radius: 12px;
-        }
-        
-        .action-number {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-        
-        .funnel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            margin: 20px 0;
-        }
-        
-        .funnel-step {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 24px;
-            background: var(--bg-card);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .funnel-label {
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        
-        .funnel-value {
-            font-weight: 700;
-            margin-left: 30px;
-        }
-        
-        .funnel-arrow {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-        
-        .table-simple {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-        
-        .table-simple th,
-        .table-simple td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .table-simple th {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-        
-        .table-simple td {
-            font-size: 0.9rem;
-        }
-        
-        .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
         .status-green { background: var(--success); }
         .status-yellow { background: var(--warning); }
         .status-red { background: var(--danger); }
         
-        /* Mobile Optimization */
-        @media (max-width: 768px) {
-            .slide {
-                padding: 20px 16px 120px 16px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-                line-height: 1.2;
-            }
-            
-            h2 {
-                font-size: 1.3rem;
-            }
-            
-            .hero {
-                padding-top: 60px;
-            }
-            
-            .hero-stats {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .hero-stat {
-                padding: 16px 24px;
-            }
-            
-            .hero-stat-value {
-                font-size: 1.6rem;
-            }
-            
-            .grid-2, .grid-3, .grid-4, .action-grid {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .metric-value {
-                font-size: 1.6rem;
-            }
-            
-            .card, .feature-card {
-                padding: 16px;
-            }
-            
-            .nav {
-                bottom: 16px;
-                padding: 10px 16px;
-                gap: 6px;
-            }
-            
-            .nav-dot {
-                width: 8px;
-                height: 8px;
-            }
-            
-            .nav-arrows {
-                bottom: 16px;
-                right: 16px;
-            }
-            
-            .nav-arrow {
-                width: 44px;
-                height: 44px;
-            }
-            
-            .slide-counter, .slide-title {
-                font-size: 11px;
-                padding: 6px 10px;
-                top: 12px;
-            }
-            
-            .slide-counter { right: 12px; }
-            .slide-title { left: 12px; max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            
-            .chart-container {
-                height: 280px;
-            }
-            
-            .verdict-box {
-                padding: 24px 16px;
-            }
-            
-            .verdict-title {
-                font-size: 1.5rem;
-            }
-            
-            .scenario-metric {
-                font-size: 1.6rem;
-            }
-        }
+        .econ-table { width: 100%; border-collapse: collapse; }
+        .econ-table th, .econ-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .econ-table th { color: var(--text-muted); font-weight: 500; }
+        .econ-table tr.highlight { background: rgba(99, 102, 241, 0.1); }
+        .econ-table tr.total { font-weight: 700; border-top: 2px solid var(--border); }
         
-        @media (max-width: 480px) {
-            h1 { font-size: 1.5rem; }
-            .metric-value { font-size: 1.4rem; }
+        /* Mobile */
+        @media (max-width: 768px) {
+            .slide { padding: 20px 16px 120px 16px; }
+            h1 { font-size: 1.6rem; line-height: 1.2; }
+            h2 { font-size: 1.2rem; }
+            .hero { padding-top: 50px; }
+            .hero-stats { flex-direction: column; gap: 10px; }
+            .hero-stat { padding: 14px 20px; }
             .hero-stat-value { font-size: 1.4rem; }
+            .grid-2, .grid-3, .grid-4, .action-grid { grid-template-columns: 1fr !important; }
+            .metric-value { font-size: 1.5rem; }
+            .card, .feature-card, .scenario-card { padding: 14px; }
+            .nav { bottom: 14px; padding: 8px 12px; gap: 4px; }
+            .nav-dot { width: 6px; height: 6px; }
+            .nav-arrows { bottom: 14px; right: 14px; }
+            .nav-arrow { width: 40px; height: 40px; font-size: 16px; }
+            .slide-counter, .slide-title { font-size: 10px; padding: 5px 10px; top: 10px; }
+            .slide-counter { right: 10px; }
+            .slide-title { left: 10px; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .chart-container { height: 260px; }
+            .verdict-box { padding: 20px 14px; }
+            .verdict-title { font-size: 1.4rem; }
+            .scenario-metric { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -590,7 +161,7 @@
     <div class="slide active" id="slide-1">
         <div class="hero">
             <h1>Pack Magik</h1>
-            <p class="subtitle">Multi-Feature Investment Analysis | January 2026</p>
+            <p class="subtitle">Full Scenario Analysis | Revenue Streams & Valuation | January 2026</p>
             
             <div class="hero-stats">
                 <div class="hero-stat">
@@ -603,34 +174,34 @@
                 </div>
                 <div class="hero-stat">
                     <div class="hero-stat-value">4</div>
-                    <div class="hero-stat-label">Core Features</div>
+                    <div class="hero-stat-label">Revenue Streams</div>
                 </div>
                 <div class="hero-stat">
-                    <div class="hero-stat-value">🟡</div>
-                    <div class="hero-stat-label">Conditional Pass</div>
+                    <div class="hero-stat-value">$3-12M</div>
+                    <div class="hero-stat-label">Valuation Range</div>
                 </div>
             </div>
             
-            <div class="explanation-box" style="max-width: 700px; margin: 40px auto 0;">
-                <strong>What's New:</strong> This analysis evaluates each feature independently — Grading, Collection Tracking, Price/P&L Tracking, and Sell Now — to identify which paths offer the strongest business potential.
+            <div class="explanation-box" style="max-width: 680px; margin: 35px auto 0;">
+                <strong>This Deck:</strong> Analyzes each revenue stream independently, models combined scenarios, and deep-dives on card buying economics with AI accuracy sensitivity.
             </div>
         </div>
     </div>
 
-    <!-- Slide 2: Feature Overview -->
+    <!-- Slide 2: Feature Overview (with corrected metrics) -->
     <div class="slide" id="slide-2">
-        <h2>Four Features, Four Business Models</h2>
-        <p class="subtitle">Each feature represents a distinct value proposition and monetization opportunity</p>
+        <h2>Four Features, Four Revenue Streams</h2>
+        <p class="subtitle">Each feature drives a distinct business model</p>
         
-        <div class="grid-4" style="margin-top: 30px;">
+        <div class="grid-4" style="margin-top: 25px;">
             <div class="feature-card highlight">
                 <span class="feature-badge badge-strong">STRONGEST</span>
                 <div class="feature-icon">📊</div>
                 <div class="feature-title">Collection Tracking</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Log cards, track portfolio value, monitor holdings</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Portfolio management, card logging</p>
                 <div class="feature-metrics">
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Users</span>
+                        <span class="feature-metric-label">Active Users</span>
                         <span class="feature-metric-value">3,034</span>
                     </div>
                     <div class="feature-metric">
@@ -638,7 +209,7 @@
                         <span class="feature-metric-value">143,614</span>
                     </div>
                     <div class="feature-metric">
-                        <span class="feature-metric-label">7+ Day Retention</span>
+                        <span class="feature-metric-label">Multi-Day Users*</span>
                         <span class="feature-metric-value">92%</span>
                     </div>
                 </div>
@@ -648,19 +219,19 @@
                 <span class="feature-badge badge-moderate">CORE</span>
                 <div class="feature-icon">🎯</div>
                 <div class="feature-title">AI Grading</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Predict PSA/BGS grades before submission</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Predict PSA/BGS grades</p>
                 <div class="feature-metrics">
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Users</span>
+                        <span class="feature-metric-label">Ever Used</span>
                         <span class="feature-metric-value">4,068</span>
                     </div>
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Sessions</span>
+                        <span class="feature-metric-label">Total Sessions</span>
                         <span class="feature-metric-value">19,809</span>
                     </div>
                     <div class="feature-metric">
                         <span class="feature-metric-label">Power Users</span>
-                        <span class="feature-metric-value">2.7%</span>
+                        <span class="feature-metric-value">324</span>
                     </div>
                 </div>
             </div>
@@ -669,28 +240,28 @@
                 <span class="feature-badge badge-moderate">GROWING</span>
                 <div class="feature-icon">💰</div>
                 <div class="feature-title">Price/P&L Tracking</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Track card values, see profit/loss over time</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Track profits, price alerts</p>
                 <div class="feature-metrics">
                     <div class="feature-metric">
                         <span class="feature-metric-label">Users w/ P&L</span>
                         <span class="feature-metric-value">3,001</span>
                     </div>
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Total P&L</span>
-                        <span class="feature-metric-value">$930K</span>
+                        <span class="feature-metric-label">In Profit</span>
+                        <span class="feature-metric-value">76.8%</span>
                     </div>
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Winners</span>
-                        <span class="feature-metric-value">76.8%</span>
+                        <span class="feature-metric-label">Total P&L</span>
+                        <span class="feature-metric-value">$930K</span>
                     </div>
                 </div>
             </div>
             
             <div class="feature-card danger">
-                <span class="feature-badge badge-weak">WEAKEST</span>
+                <span class="feature-badge badge-weak">EARLY</span>
                 <div class="feature-icon">🛒</div>
                 <div class="feature-title">Sell Now</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Instant buyback offers for cards</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Instant buyback offers</p>
                 <div class="feature-metrics">
                     <div class="feature-metric">
                         <span class="feature-metric-label">Users Surveyed</span>
@@ -701,665 +272,689 @@
                         <span class="feature-metric-value">6.2%</span>
                     </div>
                     <div class="feature-metric">
-                        <span class="feature-metric-label">Potential GMV</span>
-                        <span class="feature-metric-value">$18.7K</span>
+                        <span class="feature-metric-label">Completed Sales</span>
+                        <span class="feature-metric-value">0</span>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="explanation-box" style="margin-top: 20px;">
-            <strong>Key Insight:</strong> Collection Tracking shows the strongest engagement signals — 92% of users return after 7+ days. Grading is the acquisition driver but not the retention mechanism. The "stickiness" comes from managing your portfolio.
+        <div class="explanation-box warning" style="margin-top: 18px;">
+            <strong>*Metric Clarification:</strong> "92% Multi-Day Users" = users active on 7+ distinct days <em>ever</em> (lifetime). This is NOT traditional D7 cohort retention. It signals repeat engagement but we lack signup dates for true retention curves.
         </div>
     </div>
 
-    <!-- Slide 3: Collection Tracking Deep Dive -->
+    <!-- Slide 3: Revenue Stream 1 - Subscriptions -->
     <div class="slide" id="slide-3">
-        <h2>📊 Collection Tracking: The Hidden Gem</h2>
-        <p class="subtitle">The most engaged user segment with strong retention signals</p>
+        <h2>💳 Revenue Stream 1: Subscriptions (SaaS)</h2>
+        <p class="subtitle">Recurring revenue from premium features</p>
         
-        <div class="grid-2" style="margin-top: 30px;">
-            <div>
-                <div class="card">
-                    <h3>Portfolio Size Distribution</h3>
-                    <div style="height: 280px;">
-                        <canvas id="collectionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <div>
-                <div class="card metric" style="margin-bottom: 16px;">
-                    <div class="metric-value" style="color: var(--success);">$3,845,579</div>
-                    <div class="metric-label">Total Portfolio Value Tracked</div>
-                </div>
-                
-                <div class="grid-2">
-                    <div class="card metric">
-                        <div class="metric-value">$1,267</div>
-                        <div class="metric-label">Avg Collection</div>
-                    </div>
-                    <div class="card metric">
-                        <div class="metric-value">47.3</div>
-                        <div class="metric-label">Avg Items/User</div>
-                    </div>
-                    <div class="card metric">
-                        <div class="metric-value">841</div>
-                        <div class="metric-label">$1K+ Portfolios</div>
-                    </div>
-                    <div class="card metric">
-                        <div class="metric-value">130</div>
-                        <div class="metric-label">$5K+ Portfolios</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="explanation-box">
-            <strong>Why This Matters:</strong> High-value collectors ($1K+) represent the premium tier — 841 users managing serious portfolios. These users check prices daily, making them ideal candidates for premium subscriptions and eventually marketplace transactions.
-        </div>
-    </div>
-
-    <!-- Slide 4: Grading Feature Analysis -->
-    <div class="slide" id="slide-4">
-        <h2>🎯 AI Grading: The Acquisition Engine</h2>
-        <p class="subtitle">Strong top-of-funnel but shallow engagement depth</p>
-        
-        <div class="grid-2" style="margin-top: 30px;">
+        <div class="grid-2" style="margin-top: 25px;">
             <div class="card">
-                <h3>Grading Activity Distribution</h3>
-                <div style="height: 280px;">
-                    <canvas id="gradingChart"></canvas>
-                </div>
-            </div>
-            
-            <div>
-                <div class="funnel">
-                    <div class="funnel-step" style="width: 100%; background: linear-gradient(90deg, var(--accent) 34.5%, var(--bg-card) 34.5%);">
-                        <span class="funnel-label">Used Grading (Ever)</span>
-                        <span class="funnel-value">4,068 (34.5%)</span>
-                    </div>
-                    <div class="funnel-arrow">↓</div>
-                    <div class="funnel-step" style="width: 80%;">
-                        <span class="funnel-label">Graded 2+ Cards</span>
-                        <span class="funnel-value">2,034 (50%)</span>
-                    </div>
-                    <div class="funnel-arrow">↓</div>
-                    <div class="funnel-step" style="width: 60%;">
-                        <span class="funnel-label">Graded 10+ Cards</span>
-                        <span class="funnel-value">324 (8%)</span>
-                    </div>
-                    <div class="funnel-arrow">↓</div>
-                    <div class="funnel-step" style="width: 40%;">
-                        <span class="funnel-label">Graded 50+ Cards</span>
-                        <span class="funnel-value">37 (0.9%)</span>
-                    </div>
-                    <div class="funnel-arrow">↓</div>
-                    <div class="funnel-step" style="width: 25%;">
-                        <span class="funnel-label">Power Users (100+)</span>
-                        <span class="funnel-value">11 (0.3%)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="explanation-box">
-            <strong>The Problem:</strong> Grading has strong initial adoption (34.5%) but extreme drop-off — only 0.9% become regular users. Most people try it once or twice, get their answer, and leave. It's a one-time utility, not a recurring habit.
-        </div>
-    </div>
-
-    <!-- Slide 5: P&L and Engagement -->
-    <div class="slide" id="slide-5">
-        <h2>💰 Price Tracking: The Investor Hook</h2>
-        <p class="subtitle">Users actively tracking $930K in profits across portfolios</p>
-        
-        <div class="grid-3" style="margin-top: 30px;">
-            <div class="card metric">
-                <div class="metric-value" style="color: var(--success);">$930,900</div>
-                <div class="metric-label">Total P&L Tracked</div>
-            </div>
-            <div class="card metric">
-                <div class="metric-value">2,304</div>
-                <div class="metric-label">Users in Profit</div>
-            </div>
-            <div class="card metric">
-                <div class="metric-value">697</div>
-                <div class="metric-label">Users in Loss</div>
-            </div>
-        </div>
-        
-        <div class="grid-2" style="margin-top: 20px;">
-            <div class="card">
-                <h3>P&L Distribution</h3>
-                <div style="height: 250px;">
-                    <canvas id="pnlChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>Top Performers</h3>
+                <h3>Tier Structure</h3>
                 <table class="table-simple">
                     <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
+                        <th>Tier</th>
+                        <th>Price</th>
+                        <th>Features</th>
                     </tr>
                     <tr>
-                        <td>Best P&L</td>
-                        <td style="color: var(--success);">+$91,611</td>
+                        <td><strong>Free</strong></td>
+                        <td>$0</td>
+                        <td>3 grades/mo, basic collection</td>
                     </tr>
                     <tr>
-                        <td>Worst P&L</td>
-                        <td style="color: var(--danger);">-$9,626</td>
+                        <td><strong>Prime</strong></td>
+                        <td>$7.99/mo</td>
+                        <td>Unlimited grades, analytics</td>
                     </tr>
                     <tr>
-                        <td>Median P&L</td>
-                        <td>+$87</td>
+                        <td><strong>Pro</strong></td>
+                        <td>$19.99/mo</td>
+                        <td>Alerts, API, priority support</td>
+                    </tr>
+                </table>
+                
+                <div class="explanation-box" style="margin-top: 16px;">
+                    <strong>Survey Data:</strong> Top blocker is "Price too high for what I'd use" (56 responses). Consider value-based tiers tied to portfolio size.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>ARR Scenarios</h3>
+                <table class="table-simple">
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Paying Users</th>
+                        <th>ARPU</th>
+                        <th>ARR</th>
                     </tr>
                     <tr>
-                        <td>Win Rate</td>
-                        <td style="color: var(--success);">76.8%</td>
+                        <td><span class="status-dot status-red"></span>Bear</td>
+                        <td>500</td>
+                        <td>$8</td>
+                        <td style="color: var(--danger);">$48K</td>
                     </tr>
                     <tr>
-                        <td>Items w/ P&L Data</td>
-                        <td>56,565 (39%)</td>
+                        <td><span class="status-dot status-yellow"></span>Base</td>
+                        <td>2,000</td>
+                        <td>$10</td>
+                        <td style="color: var(--warning);">$240K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-green"></span>Bull</td>
+                        <td>5,000</td>
+                        <td>$12</td>
+                        <td style="color: var(--success);">$720K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-green"></span>Stretch</td>
+                        <td>10,000</td>
+                        <td>$15</td>
+                        <td style="color: var(--success);">$1.8M</td>
                     </tr>
                 </table>
             </div>
         </div>
         
-        <div class="explanation-box">
-            <strong>Investment Thesis:</strong> 76.8% of users tracking P&L are in profit. This creates a positive feedback loop — winners want to track more, share results, and engage deeper. The P&L feature turns casual collectors into engaged investors.
+        <div class="grid-3" style="margin-top: 16px;">
+            <div class="card metric">
+                <div class="metric-value">4.2%</div>
+                <div class="metric-label">Bear Conversion</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value">17%</div>
+                <div class="metric-label">Base Conversion</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value">42%</div>
+                <div class="metric-label">Bull Conversion</div>
+            </div>
         </div>
     </div>
 
-    <!-- Slide 6: Sell Now Analysis -->
+    <!-- Slide 4: Revenue Stream 2 - Usage-Based -->
+    <div class="slide" id="slide-4">
+        <h2>📈 Revenue Stream 2: Usage-Based Grading</h2>
+        <p class="subtitle">Pay-per-grade model for casual users</p>
+        
+        <div class="grid-2" style="margin-top: 25px;">
+            <div class="card">
+                <h3>Pricing Model</h3>
+                <table class="table-simple">
+                    <tr>
+                        <th>Volume</th>
+                        <th>Price/Grade</th>
+                    </tr>
+                    <tr>
+                        <td>1-10 grades</td>
+                        <td>$1.50</td>
+                    </tr>
+                    <tr>
+                        <td>11-50 grades</td>
+                        <td>$1.00</td>
+                    </tr>
+                    <tr>
+                        <td>51-100 grades</td>
+                        <td>$0.75</td>
+                    </tr>
+                    <tr>
+                        <td>100+ grades</td>
+                        <td>$0.50</td>
+                    </tr>
+                </table>
+                
+                <div class="explanation-box" style="margin-top: 16px;">
+                    <strong>Current Usage:</strong> ~20K grades total to date. 324 power users avg 5 grades each. Most users grade 1-2 cards and leave.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>ARR Scenarios</h3>
+                <table class="table-simple">
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Grades/Mo</th>
+                        <th>Avg Price</th>
+                        <th>ARR</th>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-red"></span>Bear</td>
+                        <td>10K</td>
+                        <td>$0.50</td>
+                        <td style="color: var(--danger);">$60K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-yellow"></span>Base</td>
+                        <td>50K</td>
+                        <td>$0.75</td>
+                        <td style="color: var(--warning);">$450K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-green"></span>Bull</td>
+                        <td>150K</td>
+                        <td>$1.00</td>
+                        <td style="color: var(--success);">$1.8M</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="explanation-box" style="margin-top: 16px;">
+            <strong>Challenge:</strong> Grading is episodic, not habitual. Users grade before submissions (2-3x/year for most). Hybrid model (subscription + usage overage) may optimize.
+        </div>
+    </div>
+
+    <!-- Slide 5: Revenue Stream 3 - Marketplace -->
+    <div class="slide" id="slide-5">
+        <h2>🏪 Revenue Stream 3: Marketplace (Take Rate)</h2>
+        <p class="subtitle">Peer-to-peer trading with transaction fees</p>
+        
+        <div class="grid-2" style="margin-top: 25px;">
+            <div class="card">
+                <h3>Marketplace Model</h3>
+                <table class="table-simple">
+                    <tr>
+                        <th>Component</th>
+                        <th>Assumption</th>
+                    </tr>
+                    <tr>
+                        <td>Take Rate</td>
+                        <td>10-15% of GMV</td>
+                    </tr>
+                    <tr>
+                        <td>Avg Transaction</td>
+                        <td>$100-400</td>
+                    </tr>
+                    <tr>
+                        <td>Inventory Risk</td>
+                        <td>None (P2P)</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Processing</td>
+                        <td>~3% (Stripe)</td>
+                    </tr>
+                    <tr>
+                        <td>Net Take Rate</td>
+                        <td>7-12%</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h3>ARR Scenarios</h3>
+                <table class="table-simple">
+                    <tr>
+                        <th>Scenario</th>
+                        <th>GMV/Mo</th>
+                        <th>Take</th>
+                        <th>ARR</th>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-red"></span>Bear</td>
+                        <td>$20K</td>
+                        <td>12%</td>
+                        <td style="color: var(--danger);">$29K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-yellow"></span>Base</td>
+                        <td>$200K</td>
+                        <td>12%</td>
+                        <td style="color: var(--warning);">$288K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot status-green"></span>Bull</td>
+                        <td>$1.5M</td>
+                        <td>15%</td>
+                        <td style="color: var(--success);">$2.7M</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="explanation-box warning" style="margin-top: 16px;">
+            <strong>Current Status:</strong> 0 marketplace transactions completed. This is theoretical revenue until the feature launches and gains traction. TCGPlayer dominates with $1B+ GMV.
+        </div>
+    </div>
+
+    <!-- Slide 6: Revenue Stream 4 - Card Buying (Part 1) -->
     <div class="slide" id="slide-6">
-        <h2>🛒 Sell Now: Marketplace Potential (But Early)</h2>
-        <p class="subtitle">Low acceptance rate reveals pricing and trust gaps</p>
+        <h2>🃏 Revenue Stream 4: Card Buying (Pre-Grade Arbitrage)</h2>
+        <p class="subtitle">Buy raw cards, grade them, sell for profit — the highest-risk, highest-reward model</p>
         
-        <div class="grid-2" style="margin-top: 30px;">
+        <div class="grid-2" style="margin-top: 25px;">
             <div class="card">
-                <h3>Offer Response Breakdown</h3>
-                <div style="height: 280px;">
-                    <canvas id="sellnowChart"></canvas>
-                </div>
+                <h3>The Opportunity (from data)</h3>
+                <table class="econ-table">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Avg raw card price</td>
+                        <td>$126.91</td>
+                    </tr>
+                    <tr>
+                        <td>Avg PSA 9 value</td>
+                        <td>$297.94 <span style="color: var(--success);">(3.7x)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Avg PSA 10 value</td>
+                        <td>$820.17 <span style="color: var(--success);">(13.7x)</span></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>PSA 10 premium</strong></td>
+                        <td><strong>6.5x over raw</strong></td>
+                    </tr>
+                </table>
             </div>
             
-            <div>
-                <div class="card" style="margin-bottom: 16px; border-color: var(--danger);">
-                    <h3 style="color: var(--danger);">⚠️ Key Risk</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
-                        <strong>69.6%</strong> dismissed offers without consideration<br>
-                        <strong>24.2%</strong> saw the offer but declined<br>
-                        <strong>Only 6.2%</strong> accepted — opt-in interest, not completed sales
-                    </p>
-                </div>
-                
-                <div class="grid-2">
-                    <div class="card metric">
-                        <div class="metric-value">$317</div>
-                        <div class="metric-label">Avg Offer Price</div>
-                    </div>
-                    <div class="card metric">
-                        <div class="metric-value">43</div>
-                        <div class="metric-label">Unique Acceptors</div>
-                    </div>
-                </div>
-                
-                <div class="card metric" style="margin-top: 16px;">
-                    <div class="metric-value">$18,744</div>
-                    <div class="metric-label">Total Potential GMV (if completed)</div>
-                </div>
+            <div class="card">
+                <h3>Cost Structure</h3>
+                <table class="econ-table">
+                    <tr>
+                        <th>Item</th>
+                        <th>Cost/Card</th>
+                    </tr>
+                    <tr>
+                        <td>PSA Economy grading</td>
+                        <td>$25</td>
+                    </tr>
+                    <tr>
+                        <td>Shipping to PSA</td>
+                        <td>$5</td>
+                    </tr>
+                    <tr>
+                        <td>Return shipping</td>
+                        <td>$5</td>
+                    </tr>
+                    <tr>
+                        <td>Packaging/handling</td>
+                        <td>$3</td>
+                    </tr>
+                    <tr>
+                        <td>Insurance (2%)</td>
+                        <td>~$2</td>
+                    </tr>
+                    <tr class="total">
+                        <td><strong>Total per card</strong></td>
+                        <td><strong>$40</strong></td>
+                    </tr>
+                </table>
             </div>
         </div>
         
-        <div class="explanation-box">
-            <strong>Reality Check:</strong> "Accepts" are opt-in survey responses, NOT completed transactions. No operational data confirms actual purchases. This feature needs a pilot with real money flowing before valuation credit.
+        <div class="explanation-box" style="margin-top: 16px;">
+            <strong>The Play:</strong> Use AI to identify high-confidence PSA 10 candidates. Buy at 80% of raw market, grade, sell graded. IF AI is accurate, margins are enormous.
         </div>
     </div>
 
-    <!-- Slide 7: Feature Overlap & Engagement -->
+    <!-- Slide 7: Card Buying - AI Accuracy Sensitivity -->
     <div class="slide" id="slide-7">
-        <h2>🔗 Feature Overlap: Finding the Power Users</h2>
-        <p class="subtitle">Multi-feature engagement reveals the stickiest cohort</p>
+        <h2>🎯 Card Buying: AI Accuracy is Everything</h2>
+        <p class="subtitle">Per-100-card P&L model based on AI prediction accuracy</p>
         
-        <div class="grid-2" style="margin-top: 30px;">
-            <div class="card">
-                <h3>User Engagement Tiers</h3>
-                <div style="height: 300px;">
-                    <canvas id="overlapChart"></canvas>
-                </div>
+        <div class="card" style="margin-top: 25px;">
+            <h3>Unit Economics by AI Accuracy (100 cards, targeting predicted 10s)</h3>
+            <table class="econ-table">
+                <tr>
+                    <th>AI Accuracy</th>
+                    <th>Outcome Distribution</th>
+                    <th>Expected Revenue</th>
+                    <th>Total Cost</th>
+                    <th>Gross Profit</th>
+                    <th>Margin</th>
+                </tr>
+                <tr>
+                    <td><span style="color: var(--danger);">30%</span></td>
+                    <td>30 PSA10 / 50 PSA9 / 20 PSA8-</td>
+                    <td>$44,752</td>
+                    <td>$14,153</td>
+                    <td style="color: var(--warning);">$30,599</td>
+                    <td>68%</td>
+                </tr>
+                <tr class="highlight">
+                    <td><span style="color: var(--warning);">50%</span></td>
+                    <td>50 PSA10 / 35 PSA9 / 15 PSA8-</td>
+                    <td>$53,341</td>
+                    <td>$14,153</td>
+                    <td style="color: var(--success);">$39,188</td>
+                    <td>73%</td>
+                </tr>
+                <tr>
+                    <td><span style="color: var(--success);">70%</span></td>
+                    <td>70 PSA10 / 25 PSA9 / 5 PSA8-</td>
+                    <td>$61,930</td>
+                    <td>$14,153</td>
+                    <td style="color: var(--success);">$47,777</td>
+                    <td>77%</td>
+                </tr>
+                <tr>
+                    <td><span style="color: var(--success);">90%</span></td>
+                    <td>90 PSA10 / 8 PSA9 / 2 PSA8-</td>
+                    <td>$76,394</td>
+                    <td>$14,153</td>
+                    <td style="color: var(--success);">$62,241</td>
+                    <td>81%</td>
+                </tr>
+            </table>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">
+                Assumptions: Buy at 80% market ($101.53/card). Grading + fulfillment $40/card. Values: PSA10=$820, PSA9=$298, PSA8-=$127.
+            </p>
+        </div>
+        
+        <div class="grid-2" style="margin-top: 16px;">
+            <div class="explanation-box danger">
+                <strong>⚠️ CRITICAL UNKNOWN:</strong> Pack Magik's AI accuracy is UNVALIDATED. No backtest exists. Industry-wide, only ~30% of submitted cards get PSA 10. Their AI predicts 9.46 avg — optimistic.
             </div>
-            
-            <div>
-                <div class="card" style="margin-bottom: 16px;">
-                    <h3>Engagement Funnel</h3>
-                    <table class="table-simple">
-                        <tr>
-                            <td><span class="status-dot status-red"></span>Never Used Features</td>
-                            <td>5,255 (44.5%)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-dot status-yellow"></span>Only Grading</td>
-                            <td>3,368 (28.5%)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-dot status-yellow"></span>Only Collection</td>
-                            <td>2,448 (20.7%)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-dot status-green"></span>Grading + Collection</td>
-                            <td>549 (4.7%)</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-dot status-green"></span>All Three Features</td>
-                            <td>35 (0.3%)</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div class="card" style="background: rgba(16, 185, 129, 0.1); border-color: var(--success);">
-                    <h3 style="color: var(--success);">💡 Strategic Insight</h3>
-                    <p style="font-size: 0.9rem; margin-top: 8px;">
-                        Users who combine Grading + Collection are your best customers. Focus on converting single-feature users to multi-feature engagement.
-                    </p>
-                </div>
+            <div class="explanation-box">
+                <strong>Breakeven Analysis:</strong> Even at 30% accuracy, the model is profitable due to PSA 9 still commanding 3.7x premium. But margins compress significantly.
             </div>
         </div>
     </div>
 
-    <!-- Slide 8: Business Scenarios -->
+    <!-- Slide 8: Card Buying - Scale & Risk -->
     <div class="slide" id="slide-8">
-        <h2>📈 Business Scenarios by Feature Focus</h2>
-        <p class="subtitle">What happens if each feature becomes the primary business?</p>
+        <h2>📊 Card Buying: Scale Economics & Risks</h2>
+        <p class="subtitle">Capital requirements and operational risks at volume</p>
         
-        <div class="grid-2" style="margin-top: 30px;">
-            <div class="scenario-card" style="border-color: var(--success);">
-                <h4><span style="color: var(--success);">🏆</span> Scenario A: Collection-First</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Portfolio management for serious collectors</p>
-                <div class="scenario-metric" style="color: var(--success);">$2.4M ARR</div>
-                <div class="scenario-details">
-                    <strong>Path:</strong> 841 users with $1K+ portfolios<br>
-                    Convert 30% to $10/mo premium = $30K MRR<br>
-                    Add $5K+ tier at $25/mo (130 users × 40%) = $13K<br>
-                    <strong>Total: $43K MRR → $516K ARR</strong><br><br>
-                    <strong>5x growth potential:</strong> Scale to 4K premium users<br>
-                    <strong>TAM:</strong> 2.5M serious TCG collectors in US
-                </div>
+        <div class="grid-2" style="margin-top: 25px;">
+            <div class="card">
+                <h3>Monthly P&L at Scale (50% AI Accuracy)</h3>
+                <table class="econ-table">
+                    <tr>
+                        <th>Volume</th>
+                        <th>Capital Req.</th>
+                        <th>Gross Profit</th>
+                        <th>Annual</th>
+                    </tr>
+                    <tr>
+                        <td>100/mo</td>
+                        <td>$14K</td>
+                        <td>$39K</td>
+                        <td style="color: var(--success);">$469K</td>
+                    </tr>
+                    <tr>
+                        <td>500/mo</td>
+                        <td>$71K</td>
+                        <td>$196K</td>
+                        <td style="color: var(--success);">$2.35M</td>
+                    </tr>
+                    <tr>
+                        <td>1,000/mo</td>
+                        <td>$142K</td>
+                        <td>$392K</td>
+                        <td style="color: var(--success);">$4.7M</td>
+                    </tr>
+                    <tr>
+                        <td>2,000/mo</td>
+                        <td>$283K</td>
+                        <td>$784K</td>
+                        <td style="color: var(--success);">$9.4M</td>
+                    </tr>
+                </table>
             </div>
             
-            <div class="scenario-card" style="border-color: var(--warning);">
-                <h4><span style="color: var(--warning);">🎯</span> Scenario B: Grading-First</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Premium AI grading for card investors</p>
-                <div class="scenario-metric" style="color: var(--warning);">$960K ARR</div>
-                <div class="scenario-details">
-                    <strong>Path:</strong> 324 power graders (10+ grades)<br>
-                    Convert 50% to $15/mo = $24K MRR<br>
-                    Usage-based tier: $0.50/grade for casual<br>
-                    ~20K grades/mo × $0.50 = $10K<br>
-                    <strong>Total: $34K MRR → $408K ARR</strong><br><br>
-                    <strong>Challenge:</strong> One-time use pattern, hard to retain<br>
-                    <strong>Risk:</strong> AI accuracy unvalidated
-                </div>
+            <div class="card" style="border-color: var(--danger);">
+                <h3 style="color: var(--danger);">⚠️ Key Risks</h3>
+                <table class="table-simple">
+                    <tr>
+                        <td><strong>AI Accuracy</strong></td>
+                        <td>Unvalidated — could be 30% or 70%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cash Cycle</strong></td>
+                        <td>60-90 day PSA turnaround = capital tied up</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Market Risk</strong></td>
+                        <td>Card values can drop during grading</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grade Variance</strong></td>
+                        <td>Same card can get 9 or 10 on resubmit</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operational</strong></td>
+                        <td>Shipping damage, lost cards, disputes</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="explanation-box warning" style="margin-top: 16px;">
+            <strong>Reality Check:</strong> This is not a SaaS business — it's a trading operation. Different risk profile, lower multiples (2-4x vs 6-10x for SaaS). Requires working capital facility.
+        </div>
+    </div>
+
+    <!-- Slide 9: Combined Scenarios -->
+    <div class="slide" id="slide-9">
+        <h2>🎯 Combined Revenue Scenarios</h2>
+        <p class="subtitle">What different business configurations could look like</p>
+        
+        <div class="grid-2" style="margin-top: 25px;">
+            <div class="scenario-card" style="border-color: var(--accent);">
+                <h4><span style="color: var(--accent);">A</span> SaaS Only (Conservative)</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Pure software, no marketplace risk</p>
+                <table class="econ-table" style="margin-top: 12px;">
+                    <tr><td>Subscriptions</td><td>$240K</td></tr>
+                    <tr><td>Usage-based grading</td><td>$200K</td></tr>
+                    <tr class="total"><td><strong>Total ARR</strong></td><td><strong>$440K</strong></td></tr>
+                </table>
+                <div class="scenario-metric" style="color: var(--accent);">$3.5M</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Valuation @ 8x ARR</p>
             </div>
             
             <div class="scenario-card" style="border-color: var(--purple);">
-                <h4><span style="color: var(--purple);">💹</span> Scenario C: Investor Tools</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Bloomberg Terminal for Pokemon cards</p>
-                <div class="scenario-metric" style="color: var(--purple);">$1.8M ARR</div>
-                <div class="scenario-details">
-                    <strong>Path:</strong> 3,001 P&L trackers<br>
-                    Target $1K+ P&L users (1,275 estimated)<br>
-                    Premium analytics at $20/mo × 25% = $64K MRR<br>
-                    <strong>Total: $64K MRR → $768K ARR</strong><br><br>
-                    <strong>Upside:</strong> Add alerts, market data, arbitrage<br>
-                    <strong>Comp:</strong> TCGPlayer Pro charges $29/mo
-                </div>
+                <h4><span style="color: var(--purple);">B</span> SaaS + Marketplace</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Add P2P trading fees</p>
+                <table class="econ-table" style="margin-top: 12px;">
+                    <tr><td>Subscriptions</td><td>$400K</td></tr>
+                    <tr><td>Usage-based</td><td>$300K</td></tr>
+                    <tr><td>Marketplace (12%)</td><td>$288K</td></tr>
+                    <tr class="total"><td><strong>Total ARR</strong></td><td><strong>$988K</strong></td></tr>
+                </table>
+                <div class="scenario-metric" style="color: var(--purple);">$5.9M</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Valuation @ 6x ARR</p>
             </div>
             
-            <div class="scenario-card" style="border-color: var(--danger);">
-                <h4><span style="color: var(--danger);">🛒</span> Scenario D: Marketplace</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Instant buyback and trading</p>
-                <div class="scenario-metric" style="color: var(--danger);">$570K ARR</div>
-                <div class="scenario-details">
-                    <strong>Path:</strong> 6.2% acceptance × scale<br>
-                    If 5K transactions/mo × $317 avg = $1.6M GMV<br>
-                    At 15% take rate = $238K/mo revenue<br>
-                    <strong>Theoretical: $2.8M ARR</strong><br><br>
-                    <strong>Reality:</strong> 0 completed transactions to date<br>
-                    <strong>Risk:</strong> Capital intensive, margin compression
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 9: Competitive Landscape -->
-    <div class="slide" id="slide-9">
-        <h2>🏁 Competitive Position by Feature</h2>
-        <p class="subtitle">Where Pack Magik has defensible advantages</p>
-        
-        <div class="card" style="margin-top: 30px;">
-            <table class="table-simple">
-                <tr>
-                    <th>Feature</th>
-                    <th>Competitors</th>
-                    <th>Pack Magik Edge</th>
-                    <th>Defensibility</th>
-                </tr>
-                <tr>
-                    <td><strong>AI Grading</strong></td>
-                    <td>PSA PreGrade, CGC Estimate, Dye Apps</td>
-                    <td>Faster, mobile-native UX</td>
-                    <td><span style="color: var(--warning);">Medium</span> — easy to replicate</td>
-                </tr>
-                <tr>
-                    <td><strong>Collection Tracking</strong></td>
-                    <td>TCGPlayer, Pokéllector, DragonShield</td>
-                    <td>P&L + grading integration</td>
-                    <td><span style="color: var(--success);">High</span> — switching cost with data</td>
-                </tr>
-                <tr>
-                    <td><strong>Price Tracking</strong></td>
-                    <td>PriceCharting, TCGPlayer Market</td>
-                    <td>Personal P&L dashboard</td>
-                    <td><span style="color: var(--success);">High</span> — portfolio lock-in</td>
-                </tr>
-                <tr>
-                    <td><strong>Sell Now</strong></td>
-                    <td>eBay, TCGPlayer Direct, COMC</td>
-                    <td>Integrated with collection</td>
-                    <td><span style="color: var(--danger);">Low</span> — commodity marketplace</td>
-                </tr>
-            </table>
-        </div>
-        
-        <div class="grid-2" style="margin-top: 20px;">
-            <div class="card" style="border-color: var(--success);">
-                <h3>🛡️ Moat Potential</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
-                    <strong>Data Network Effects:</strong> More users → better price data → better P&L accuracy → more users<br><br>
-                    <strong>Switching Cost:</strong> Once 100+ cards logged with purchase prices, users won't migrate
-                </p>
+            <div class="scenario-card" style="border-color: var(--success);">
+                <h4><span style="color: var(--success);">C</span> Full Stack</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">SaaS + Market + Card Buying</p>
+                <table class="econ-table" style="margin-top: 12px;">
+                    <tr><td>Subscriptions</td><td>$500K</td></tr>
+                    <tr><td>Usage-based</td><td>$400K</td></tr>
+                    <tr><td>Marketplace</td><td>$500K</td></tr>
+                    <tr><td>Card buying profit</td><td>$1.5M</td></tr>
+                    <tr class="total"><td><strong>Total ARR</strong></td><td><strong>$2.9M</strong></td></tr>
+                </table>
+                <div class="scenario-metric" style="color: var(--success);">$11.6M</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Valuation @ 4x (blended)*</p>
             </div>
             
-            <div class="card" style="border-color: var(--warning);">
-                <h3>⚠️ Risk Factors</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
-                    <strong>AI Grading:</strong> No backtest data — accuracy claims unverified<br><br>
-                    <strong>Sell Now:</strong> Capital requirements for inventory, margin pressure
-                </p>
+            <div class="scenario-card" style="border-color: var(--warning);">
+                <h4><span style="color: var(--warning);">D</span> Market Leader</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">10K subs, $20M GMV, scale buying</p>
+                <table class="econ-table" style="margin-top: 12px;">
+                    <tr><td>Subscriptions</td><td>$1.8M</td></tr>
+                    <tr><td>Usage-based</td><td>$1.0M</td></tr>
+                    <tr><td>Marketplace (12%)</td><td>$2.4M</td></tr>
+                    <tr><td>Card buying</td><td>$3.0M</td></tr>
+                    <tr class="total"><td><strong>Total ARR</strong></td><td><strong>$8.2M</strong></td></tr>
+                </table>
+                <div class="scenario-metric" style="color: var(--warning);">$41M</div>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Valuation @ 5x ARR</p>
             </div>
         </div>
+        
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 14px;">*Card buying revenue gets lower multiple (2-3x) due to capital intensity and risk. Blended multiple reflects mix.</p>
     </div>
 
-    <!-- Slide 10: Recommendation -->
+    <!-- Slide 10: Bundle Strategy -->
     <div class="slide" id="slide-10">
+        <h2>📦 Bundle Strategy: Optimal Packaging</h2>
+        <p class="subtitle">How to maximize LTV through feature combinations</p>
+        
+        <div class="grid-3" style="margin-top: 25px;">
+            <div class="card">
+                <h3>🎯 Starter Bundle</h3>
+                <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent); margin: 12px 0;">$4.99/mo</p>
+                <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 18px; line-height: 1.8;">
+                    <li>10 grades/month</li>
+                    <li>Basic collection tracking</li>
+                    <li>Price lookup</li>
+                </ul>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <strong>Target:</strong> Casual collectors<br>
+                    <strong>LTV:</strong> $60/year
+                </p>
+            </div>
+            
+            <div class="card" style="border-color: var(--accent); box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);">
+                <h3>⭐ Pro Bundle</h3>
+                <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin: 12px 0;">$14.99/mo</p>
+                <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 18px; line-height: 1.8;">
+                    <li>Unlimited grades</li>
+                    <li>Full collection + P&L</li>
+                    <li>Price alerts</li>
+                    <li>Sell Now access</li>
+                    <li>Analytics dashboard</li>
+                </ul>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <strong>Target:</strong> Active investors<br>
+                    <strong>LTV:</strong> $180/year
+                </p>
+            </div>
+            
+            <div class="card">
+                <h3>🏆 Enterprise</h3>
+                <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin: 12px 0;">$49.99/mo</p>
+                <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 18px; line-height: 1.8;">
+                    <li>Everything in Pro</li>
+                    <li>API access</li>
+                    <li>Bulk upload</li>
+                    <li>Priority grading queue</li>
+                    <li>White-glove support</li>
+                </ul>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <strong>Target:</strong> Dealers, shops<br>
+                    <strong>LTV:</strong> $600/year
+                </p>
+            </div>
+        </div>
+        
+        <div class="explanation-box" style="margin-top: 18px;">
+            <strong>Bundle Logic:</strong> Collection is the retention hook → Grading is the acquisition driver → P&L tracking builds habit → Sell Now monetizes the engaged user. Each feature feeds the next.
+        </div>
+    </div>
+
+    <!-- Slide 11: Final Recommendation -->
+    <div class="slide" id="slide-11">
         <h2>Final Recommendation</h2>
         
         <div class="verdict-box">
             <div class="verdict-emoji">🟡</div>
             <div class="verdict-title">CONDITIONAL PASS</div>
-            <div class="verdict-subtitle">Strong collection engagement, but AI claims need validation</div>
+            <div class="verdict-subtitle">Strong foundation, but key unknowns require validation before pricing upside</div>
             
             <div class="action-grid">
                 <div class="action-item">
                     <div class="action-number">1</div>
                     <div>
                         <strong>Validate AI Accuracy</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Request backtest: 500+ cards with actual PSA outcomes vs. predictions</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">500+ card backtest with actual PSA outcomes</p>
                     </div>
                 </div>
                 <div class="action-item">
                     <div class="action-number">2</div>
                     <div>
                         <strong>Get Subscription Metrics</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Paying subscribers, MRR, monthly churn rate</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">Paying subscribers, MRR, monthly churn</p>
                     </div>
                 </div>
                 <div class="action-item">
                     <div class="action-number">3</div>
                     <div>
-                        <strong>Sell Now Pilot</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Run 100 real transactions before marketplace valuation credit</p>
+                        <strong>Pilot Card Buying</strong>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">100-card test to validate unit economics</p>
                     </div>
                 </div>
                 <div class="action-item">
                     <div class="action-number">4</div>
                     <div>
-                        <strong>Collection Retention</strong>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">D30/D90 retention for collection users specifically</p>
+                        <strong>True Retention Data</strong>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">D7/D30/D90 cohort retention by signup date</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="grid-3" style="margin-top: 30px;">
+        <div class="grid-3" style="margin-top: 25px;">
             <div class="card" style="text-align: center;">
                 <h3>Bear Case</h3>
-                <div style="font-size: 2rem; font-weight: 700; color: var(--danger); margin: 16px 0;">$2-3M</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">AI unproven, Sell Now unvalidated, 44% ghost users</p>
+                <div style="font-size: 1.8rem; font-weight: 700; color: var(--danger); margin: 14px 0;">$2-3M</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">AI 30% accurate, no marketplace traction, pure SaaS</p>
             </div>
             <div class="card" style="text-align: center; border-color: var(--accent);">
                 <h3>Base Case</h3>
-                <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin: 16px 0;">$4-6M</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Collection feature carries value, grading adds upside</p>
+                <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent); margin: 14px 0;">$4-6M</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">AI 50% accurate, modest marketplace, collection carries</p>
             </div>
             <div class="card" style="text-align: center;">
                 <h3>Bull Case</h3>
-                <div style="font-size: 2rem; font-weight: 700; color: var(--success); margin: 16px 0;">$8-12M</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">AI validated, marketplace launched, 10K paying subs</p>
+                <div style="font-size: 1.8rem; font-weight: 700; color: var(--success); margin: 14px 0;">$10-15M</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">AI validated, card buying scales, marketplace launches</p>
             </div>
         </div>
     </div>
 
     <!-- Navigation -->
-    <div class="nav">
-        <div class="nav-dot active" onclick="goToSlide(1)"></div>
-        <div class="nav-dot" onclick="goToSlide(2)"></div>
-        <div class="nav-dot" onclick="goToSlide(3)"></div>
-        <div class="nav-dot" onclick="goToSlide(4)"></div>
-        <div class="nav-dot" onclick="goToSlide(5)"></div>
-        <div class="nav-dot" onclick="goToSlide(6)"></div>
-        <div class="nav-dot" onclick="goToSlide(7)"></div>
-        <div class="nav-dot" onclick="goToSlide(8)"></div>
-        <div class="nav-dot" onclick="goToSlide(9)"></div>
-        <div class="nav-dot" onclick="goToSlide(10)"></div>
-    </div>
-    
+    <div class="nav" id="nav"></div>
     <div class="nav-arrows">
         <button class="nav-arrow" onclick="prevSlide()">←</button>
         <button class="nav-arrow" onclick="nextSlide()">→</button>
     </div>
-    
-    <div class="slide-counter">
-        <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
-    </div>
-    
+    <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">11</span></div>
     <div class="slide-title" id="slideTitle">Overview</div>
 
     <script>
+        const totalSlides = 11;
         let currentSlide = 1;
-        const totalSlides = 10;
+        const slideTitles = ['Overview', 'Features', 'Subscriptions', 'Usage-Based', 'Marketplace', 'Card Buying', 'AI Sensitivity', 'Scale & Risk', 'Combined', 'Bundles', 'Recommendation'];
         
-        const slideTitles = [
-            'Overview',
-            'Feature Analysis',
-            'Collection Tracking',
-            'AI Grading',
-            'Price/P&L Tracking',
-            'Sell Now',
-            'User Engagement',
-            'Business Scenarios',
-            'Competition',
-            'Recommendation'
-        ];
+        // Build nav dots
+        const nav = document.getElementById('nav');
+        for (let i = 1; i <= totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'nav-dot' + (i === 1 ? ' active' : '');
+            dot.onclick = () => goToSlide(i);
+            nav.appendChild(dot);
+        }
         
         function goToSlide(n) {
             document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
-            
             currentSlide = n;
             document.getElementById(`slide-${n}`).classList.add('active');
             document.querySelectorAll('.nav-dot')[n-1].classList.add('active');
             document.getElementById('currentSlide').textContent = n;
             document.getElementById('slideTitle').textContent = slideTitles[n-1];
-            
-            // Initialize charts when slide becomes active
-            if (n === 3) initCollectionChart();
-            if (n === 4) initGradingChart();
-            if (n === 5) initPnlChart();
-            if (n === 6) initSellnowChart();
-            if (n === 7) initOverlapChart();
         }
         
-        function nextSlide() {
-            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
-        }
-        
-        function prevSlide() {
-            if (currentSlide > 1) goToSlide(currentSlide - 1);
-        }
+        function nextSlide() { if (currentSlide < totalSlides) goToSlide(currentSlide + 1); }
+        function prevSlide() { if (currentSlide > 1) goToSlide(currentSlide - 1); }
         
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
         });
         
-        // Touch swipe support
         let touchStartX = 0;
         document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
         document.addEventListener('touchend', e => {
             const diff = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) nextSlide();
-                else prevSlide();
-            }
+            if (Math.abs(diff) > 50) { if (diff > 0) nextSlide(); else prevSlide(); }
         });
-        
-        // Chart initializations
-        let charts = {};
-        
-        function initCollectionChart() {
-            if (charts.collection) return;
-            const ctx = document.getElementById('collectionChart').getContext('2d');
-            charts.collection = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['1-10 items', '11-50 items', '51-100 items', '100+ items'],
-                    datasets: [{
-                        label: 'Users',
-                        data: [1569, 861, 288, 317],
-                        backgroundColor: ['#6366f1', '#818cf8', '#a5b4fc', '#10b981'],
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                    }
-                }
-            });
-        }
-        
-        function initGradingChart() {
-            if (charts.grading) return;
-            const ctx = document.getElementById('gradingChart').getContext('2d');
-            charts.grading = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['1-2 grades', '3-10 grades', '11-50 grades', '50+ grades'],
-                    datasets: [{
-                        data: [2034, 1710, 287, 37],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#6366f1', '#10b981'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { color: '#e2e8f0', padding: 16 } }
-                    }
-                }
-            });
-        }
-        
-        function initPnlChart() {
-            if (charts.pnl) return;
-            const ctx = document.getElementById('pnlChart').getContext('2d');
-            charts.pnl = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Profit (76.8%)', 'Loss (23.2%)'],
-                    datasets: [{
-                        data: [2304, 697],
-                        backgroundColor: ['#10b981', '#ef4444'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20 } }
-                    }
-                }
-            });
-        }
-        
-        function initSellnowChart() {
-            if (charts.sellnow) return;
-            const ctx = document.getElementById('sellnowChart').getContext('2d');
-            charts.sellnow = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Dismissed (69.6%)', 'Declined (24.2%)', 'Accepted (6.2%)'],
-                    datasets: [{
-                        data: [666, 232, 59],
-                        backgroundColor: ['#64748b', '#f59e0b', '#10b981'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { color: '#e2e8f0', padding: 16 } }
-                    }
-                }
-            });
-        }
-        
-        function initOverlapChart() {
-            if (charts.overlap) return;
-            const ctx = document.getElementById('overlapChart').getContext('2d');
-            charts.overlap = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Never Used', 'Only Grading', 'Only Collection', 'Both', 'All Three'],
-                    datasets: [{
-                        label: 'Users',
-                        data: [5255, 3368, 2448, 549, 35],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981'],
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-                        y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                    }
-                }
-            });
-        }
         
         document.getElementById('totalSlides').textContent = totalSlides;
     </script>
