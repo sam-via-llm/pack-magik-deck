@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack Magik Due Diligence | Investment Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .slide {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 60px 100px 60px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted var(--text-muted);
+        }
+        
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            white-space: normal;
+            width: 280px;
+            text-align: left;
+            line-height: 1.5;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            pointer-events: none;
+        }
+        
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #1e293b;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            margin-bottom: -16px;
+        }
+        
+        .tooltip:hover::after,
+        .tooltip:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .tooltip:hover::after {
+            bottom: calc(100% + 10px);
+        }
+        
+        .tooltip:hover::before {
+            bottom: calc(100% + 10px);
+            margin-bottom: -16px;
+        }
+        
+        /* Info icon for tooltips */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: var(--border);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-left: 6px;
+            cursor: help;
+            vertical-align: middle;
+        }
+        
+        .info-icon:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-dot:hover {
+            background: var(--text-muted);
+            transform: scale(1.2);
+        }
+        
+        .nav-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+        }
+        
+        .nav-arrows {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-arrow:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+        }
+        
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .slide-title {
+            position: fixed;
+            top: 30px;
+            left: 40px;
+            font-size: 14px;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        @media (max-width: 1400px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 1000px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 24px 16px;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-delta {
+            font-size: 0.8rem;
+            margin-top: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .delta-up { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .delta-down { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .delta-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        
+        .verdict {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .verdict-pass { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .verdict-conditional { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .verdict-fail { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin-top: 15px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .table th, .table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tr:hover td {
+            background: var(--bg-card-hover);
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .badge-info { background: rgba(99, 102, 241, 0.15); color: var(--accent-light); }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 40px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .key-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .key-point:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .key-point-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        
+        .key-point-text h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .key-point-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .risk-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .risk-item:last-child {
+            border-bottom: none;
+        }
+        
+        .risk-label {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        
+        .risk-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+        
+        .risk-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 25px;
+        }
+        
+        @media (max-width: 1200px) {
+            .model-comparison { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .model-card.recommended {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+        }
+        
+        .model-card h4 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        
+        .model-stat {
+            margin: 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .model-stat strong {
+            color: var(--text);
+        }
+        
+        .final-verdict {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            margin-top: 30px;
+        }
+        
+        .final-verdict h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .action-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 25px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+        
+        .action-number {
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .action-item strong {
+            font-size: 0.9rem;
+        }
+        
+        .action-item p {
+            font-size: 0.8rem;
+        }
+        
+        .funnel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin: 20px 0;
+        }
+        
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .funnel-step:hover {
+            border-color: var(--border);
+        }
+        
+        .funnel-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .funnel-value {
+            font-weight: 700;
+            margin-left: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .funnel-arrow {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+        
+        .explanation-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .explanation-box strong {
+            color: var(--accent-light);
+        }
+        
+        .callout {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .callout-danger {
+            border-left-color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .callout-warning {
+            border-left-color: var(--warning);
+            background: rgba(245, 158, 11, 0.05);
+        }
+        
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px 16px 120px 16px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            h3 {
+                font-size: 1rem;
+            }
+            
+            .subtitle {
+                font-size: 0.95rem;
+            }
+            
+            .hero {
+                padding-top: 60px;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .hero-stat {
+                padding: 12px 20px;
+            }
+            
+            .grid-2, .grid-3, .grid-4, .model-comparison, .action-items {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .metric-value {
+                font-size: 1.8rem;
+            }
+            
+            .metric {
+                padding: 16px 12px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .nav {
+                bottom: 16px;
+                padding: 10px 16px;
+                gap: 8px;
+            }
+            
+            .nav-dot {
+                width: 10px;
+                height: 10px;
+            }
+            
+            .nav-arrows {
+                bottom: 16px;
+                right: 16px;
+            }
+            
+            .nav-arrow {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            
+            .slide-counter, .slide-title {
+                font-size: 12px;
+                padding: 6px 12px;
+                top: 16px;
+            }
+            
+            .slide-counter {
+                right: 16px;
+            }
+            
+            .slide-title {
+                left: 16px;
+                max-width: 45%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .funnel-step {
+                padding: 12px 16px;
+            }
+            
+            .funnel-label, .funnel-value {
+                font-size: 0.85rem;
+            }
+            
+            .final-verdict {
+                padding: 30px 20px;
+            }
+            
+            .final-verdict h2 {
+                font-size: 1.6rem;
+            }
+            
+            .chart-container, .chart-card {
+                min-height: 280px;
+            }
+            
+            .tooltip::after {
+                width: 220px;
+                font-size: 0.8rem;
+            }
+            
+            .explanation-box {
+                padding: 14px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .risk-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .risk-bar-container {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .slide {
+                padding: 16px 12px 110px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide active" id="slide-1">
+        <div class="hero">
+            <div class="logo">🎴</div>
+            <h1>Pack Magik</h1>
+            <p class="subtitle">Investment Due Diligence Analysis</p>
+            <div style="margin: 25px 0;">
+                <span class="verdict verdict-conditional tooltip" data-tip="A conditional pass means the opportunity is interesting but requires additional validation before investment. Key data gaps must be addressed.">🟡 CONDITIONAL PASS</span>
+            </div>
+            <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto; font-size: 1rem;">
+                AI-powered Pokemon TCG grading prediction tool with proposed instant buyback feature. 
+                Shows real product-market fit and efficient acquisition, but core claims remain unvalidated.
+            </p>
+            <div class="key-points">
+                <div class="key-point">
+                    <span class="key-point-icon">✅</span>
+                    <div class="key-point-text">
+                        <h4>Clear Product-Market Fit</h4>
+                        <p class="tooltip" data-tip="In user surveys (n=242), 52% of respondents said 'Grade cards smarter' is their #1 goal when using Pack Magik. This indicates the core AI grading feature addresses a real user need.">52% cite AI grading as #1 goal</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <span class="key-point-icon">✅</span>
+                    <div class="key-point-text">
+                        <h4>Efficient Acquisition</h4>
+                        <p class="tooltip" data-tip="User survey shows 40% discovered Pack Magik via Instagram and 19% via TikTok. This organic/viral acquisition means near-zero Customer Acquisition Cost (CAC), which is highly capital-efficient.">40% Instagram, 19% TikTok (organic)</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <span class="key-point-icon">🔴</span>
+                    <div class="key-point-text">
+                        <h4>AI Accuracy Unknown</h4>
+                        <p class="tooltip" data-tip="The founder provided no data showing actual PSA/BGS grades vs. AI predictions. Without this 'backtest' data, we cannot verify if the AI actually works. This is a critical gap for the core value proposition.">No validation data provided</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <span class="key-point-icon">🔴</span>
+                    <div class="key-point-text">
+                        <h4>Sell Now Unproven</h4>
+                        <p class="tooltip" data-tip="Only 6.2% of users shown a buyback offer clicked 'Accept' (59 out of 957). This is a soft interest signal only—not a completed transaction. The other 93.8% either declined (24.2%) or dismissed without engaging (69.6%). True conversion to actual sales would likely be much lower.">6.2% acceptance rate in survey</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="explanation-box" style="margin-top: 30px; max-width: 700px; margin-left: auto; margin-right: auto;">
+                <strong>💡 How to read this presentation:</strong> Hover over underlined terms and metrics for detailed explanations. Use arrow keys or click the dots below to navigate between slides.
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: User Metrics -->
+    <div class="slide" id="slide-2">
+        <h2>👥 User Analytics</h2>
+        <p class="subtitle">Analysis of 11,797 registered users across engagement, retention, and revenue metrics</p>
+        
+        <div class="grid grid-4" style="margin-bottom: 25px;">
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--accent);" data-tip="Total unique user accounts in the database. This is the 'registered users' number—not necessarily active or paying.">11,797</div>
+                <div class="metric-label">Total Users</div>
+                <div class="metric-delta delta-up">✓ Verified from data</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--warning);" data-tip="Percentage of registered users who have used the core feature (AI grading) at least once. Only 1 in 3 users have ever graded a card—the majority sign up but never engage.">34.5%</div>
+                <div class="metric-label">Active (1+ Grade)</div>
+                <div class="metric-delta delta-warn">⚠️ Low activation</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--danger);" data-tip="Users who have graded 10+ cards. These are the engaged 'power users' who drive most value. Only 396 people—a very small core.">3.4%</div>
+                <div class="metric-label">Power Users (10+)</div>
+                <div class="metric-delta delta-down">🔴 396 users</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--success);" data-tip="Total profit/loss tracked in user collections. This shows users are actually using the collection tracking feature to monitor their card investments.">$930K</div>
+                <div class="metric-label">P&L Tracked</div>
+                <div class="metric-delta delta-up">✓ Engagement signal</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>User Engagement Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>What this shows:</strong> 65.5% of users have never graded a single card. The product has a severe activation problem—most users try the app but don't engage with the core feature.
+                </div>
+            </div>
+            <div class="card">
+                <h3>Retention Curve <span class="tooltip info-icon" data-tip="Retention measures what % of users come back after signing up. D7 = 7 days later, D30 = 30 days later. Industry benchmark for consumer apps is 35-45% at D7.">?</span></h3>
+                <div class="chart-container">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>What this shows:</strong> Pack Magik's D7 retention (28.7%) is below industry benchmarks (35-45%). The red line shows actual retention; green dashed line shows what "good" looks like.
+                </div>
+            </div>
+        </div>
+        
+        <div class="callout callout-warning" style="margin-top: 20px;">
+            <strong>⚠️ Critical Finding:</strong> 65.5% of registered users have never graded a single card. The core feature isn't converting signups to engaged users. This suggests an onboarding or value demonstration problem.
+        </div>
+    </div>
+
+    <!-- Slide 3: Sell Now Analysis -->
+    <div class="slide" id="slide-3">
+        <h2>💸 Sell Now Feature Analysis</h2>
+        <p class="subtitle">957 survey responses analyzed for buyback interest and adverse selection risk</p>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Conversion Funnel <span class="tooltip info-icon" data-tip="A conversion funnel shows how many users move from one stage to the next. Here: how many users saw the Sell Now offer → engaged with it → accepted it.">?</span></h3>
+                <div class="funnel">
+                    <div class="funnel-step" style="width: 100%; background: var(--accent); color: white;">
+                        <span class="funnel-label">Survey Exposures</span>
+                        <span class="funnel-value">957</span>
+                    </div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-step" style="width: 50%; background: var(--warning);">
+                        <span class="funnel-label tooltip" data-tip="Users who either accepted OR declined the offer (i.e., made an active choice). 69.6% dismissed the popup without engaging at all.">Engaged (not dismissed)</span>
+                        <span class="funnel-value">291 (30.4%)</span>
+                    </div>
+                    <div class="funnel-arrow">↓</div>
+                    <div class="funnel-step" style="width: 20%; background: var(--danger);">
+                        <span class="funnel-label tooltip" data-tip="Users who clicked 'Accept' on the buyback offer. Important: This is NOT a completed transaction—just expressed interest. No money changed hands.">Accepted Offer</span>
+                        <span class="funnel-value">59 (6.2%)</span>
+                    </div>
+                </div>
+                <div class="explanation-box">
+                    <strong>Key insight:</strong> Only 6.2% expressed interest. 69.6% ignored the offer entirely. Even among those who engaged, most declined. True transaction conversion would likely be 1-2%.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Acceptance by Offer Multiplier <span class="tooltip info-icon" data-tip="The 'multiplier' is the offer price as a % of the card's raw market value. Higher multipliers = more generous offers. This chart shows acceptance rates increase when offers are more generous.">?</span></h3>
+                <div class="chart-container">
+                    <canvas id="multiplierChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>Pattern:</strong> Users accept at 9.2% when offered &gt;125% of market value, but only 3.9% at 75-100%. They're rational—only selling when the deal is generous.
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-2" style="margin-top: 20px;">
+            <div class="card">
+                <h3>Adverse Selection Evidence <span class="tooltip info-icon" data-tip="Adverse selection means users have information Pack Magik doesn't. If users only accept offers on cards they know are overpriced (or AI overgraded), Pack Magik loses money.">?</span></h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Accepts</th>
+                            <th>Declines</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tooltip" data-tip="The potential profit if the user graded the card themselves vs. selling now. Higher number = user is giving up more potential profit by selling.">Avg Suspected Profit</td>
+                            <td style="color: var(--success);">$1,094</td>
+                            <td>$408</td>
+                            <td><span class="badge badge-danger">🔴 Bad</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="The dollar amount Pack Magik offered to buy the card.">Avg Offer Price</td>
+                            <td style="color: var(--success);">$318</td>
+                            <td>$104</td>
+                            <td><span class="badge badge-danger">🔴 Bad</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="The AI's predicted PSA grade for the card (1-10 scale). PSA 10 is 'gem mint' and worth the most.">Mean AI Grade</td>
+                            <td>9.36</td>
+                            <td>9.56</td>
+                            <td><span class="badge badge-warning">Neutral</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="explanation-box">
+                    <strong>🚨 Red flag:</strong> Users who accept have $1,094 in suspected profit vs $408 for declines. This means users only sell when they're getting a great deal—Pack Magik would be buying overpriced cards.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Survey Response Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="responseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: AI Validation -->
+    <div class="slide" id="slide-4">
+        <h2>🤖 AI Grader Validation</h2>
+        <p class="subtitle">Analysis of AI accuracy claims vs. available evidence</p>
+        
+        <div class="grid grid-3" style="margin-bottom: 25px;">
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--danger);" data-tip="66.4% of cards scanned by users received a 'PSA 10' prediction from the AI. Real PSA 10 rates for modern Pokemon are typically 15-35%. This suggests either severe selection bias (users only scan their best cards) or AI miscalibration.">66.4%</div>
+                <div class="metric-label">Predicted PSA 10</div>
+                <div class="metric-delta delta-down">🔴 Statistically implausible</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--warning);" data-tip="93-100% of scanned cards showed zero defects detected. Either users only scan pristine cards, or the defect detection isn't sensitive enough to catch real issues.">93-100%</div>
+                <div class="metric-label">Zero Defects Detected</div>
+                <div class="metric-delta delta-warn">⚠️ Calibration concern</div>
+            </div>
+            <div class="card metric">
+                <div class="metric-value tooltip" style="color: var(--danger);" data-tip="Number of cards where we can compare the AI prediction to the actual PSA/BGS grade received. Without this data, we cannot verify if the AI actually works.">0</div>
+                <div class="metric-label">Validation Cards</div>
+                <div class="metric-delta delta-down">🔴 No backtest data</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>AI Grade Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="gradeDistChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>Problem:</strong> 66% predicted as PSA 10 + 24% as PSA 9 = 90% of cards predicted as "gem mint." Real-world rates are much lower. Either extreme selection bias or AI overconfidence.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Validation Data Status</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Required for Validation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tooltip" data-tip="Cards where AI prediction can be compared to actual PSA/BGS grade. Minimum 500 cards needed for statistical significance.">Actual PSA/BGS outcomes</td>
+                            <td><span class="badge badge-danger">❌ Not Provided</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="A table showing predicted grades vs actual grades. E.g., 'Of 100 cards predicted as 10, how many came back as 10? 9? 8?'">Confusion matrix</td>
+                            <td><span class="badge badge-danger">❌ Not Provided</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="When AI says 'PSA 10', what % actually get PSA 10? This is the most important metric for user trust.">Precision on 10s</td>
+                            <td><span class="badge badge-danger">❌ Unknown</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="A curve showing whether AI confidence scores match actual probabilities. E.g., '80% confident' should be right 80% of the time.">Calibration curve</td>
+                            <td><span class="badge badge-danger">❌ Not Provided</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="callout callout-danger" style="margin-top: 20px;">
+            <strong>🚨 Critical Risk:</strong> The core value proposition (AI accurately predicts grades) cannot be verified. If the AI systematically overpredicts 10s as 9s, the Sell Now feature loses money on every transaction. <strong>Must request 500+ card backtest with actual outcomes before investing.</strong>
+        </div>
+    </div>
+
+    <!-- Slide 5: Market Analysis -->
+    <div class="slide" id="slide-5">
+        <h2>📈 Market Analysis</h2>
+        <p class="subtitle">TAM/SAM/SOM sizing and competitive landscape</p>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Market Sizing <span class="tooltip info-icon" data-tip="TAM = Total Addressable Market (everyone who could possibly use this). SAM = Serviceable Addressable Market (realistic target segment). SOM = Serviceable Obtainable Market (what Pack Magik can actually capture in 3-5 years).">?</span></h3>
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>Market context:</strong> ~5-6M Pokemon cards graded annually. TAM includes all collectors who might use tools ($90M). SOM is what Pack Magik can realistically capture ($5-15M ARR at maturity).
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Acquisition Channels</h3>
+                <div class="chart-container">
+                    <canvas id="acquisitionChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>Why this matters:</strong> 59% from Instagram + TikTok = organic/viral acquisition with near-zero CAC. This is a genuine strength and makes unit economics attractive.
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-2" style="margin-top: 20px;">
+            <div class="card">
+                <h3>Competitive Landscape</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Competitor</th>
+                            <th>Focus</th>
+                            <th>Threat Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tooltip" data-tip="PSA acquired Genamint, an AI platform. They could build their own grade prediction tool and instantly have distribution to all their customers.">PSA (Genamint)</td>
+                            <td>AI grading platform</td>
+                            <td><span class="badge badge-danger">Existential</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Free collection tracking app with large user base. Could add AI grading features.">Collectr</td>
+                            <td>Collection tracking</td>
+                            <td><span class="badge badge-warning">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Price analytics and market data platform for collectors.">CardLadder</td>
+                            <td>Price analytics</td>
+                            <td><span class="badge badge-warning">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Direct competitor with similar AI grading features.">Card Boss / CardMintAI</td>
+                            <td>AI grading</td>
+                            <td><span class="badge badge-info">Direct</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h3>Industry Power Structure</h3>
+                <div class="risk-item">
+                    <span class="risk-label tooltip" data-tip="PSA controls 76% of the grading market. They set standards, prices, and could enter the AI prediction space.">PSA Market Share</span>
+                    <div class="risk-bar">
+                        <div class="risk-fill" style="width: 76%; background: var(--accent);"></div>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">76%</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label tooltip" data-tip="Pokemon TCG represents roughly 65% of all TCG cards graded.">Pokemon % of TCG Grading</span>
+                    <div class="risk-bar">
+                        <div class="risk-fill" style="width: 65%; background: var(--success);"></div>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">~65%</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label tooltip" data-tip="The collectibles market is cyclical. 2020-2021 saw a massive boom, 2022-2023 a correction. Pack Magik's value correlates with market activity.">Cyclicality Risk</span>
+                    <div class="risk-bar">
+                        <div class="risk-fill" style="width: 60%; background: var(--warning);"></div>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Medium</span>
+                </div>
+                <div class="explanation-box" style="margin-top: 15px;">
+                    <strong>Key risk:</strong> PSA acquired Genamint (AI platform). They could build this in-house and have instant distribution to millions of collectors.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Unit Economics -->
+    <div class="slide" id="slide-6">
+        <h2>💰 Unit Economics</h2>
+        <p class="subtitle">Customer lifetime value, acquisition costs, and revenue model options</p>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>LTV by Churn Scenario <span class="tooltip info-icon" data-tip="LTV = Lifetime Value = total revenue from a customer over their lifetime. Churn = % of customers who cancel each month. Lower churn = higher LTV.">?</span></h3>
+                <div class="chart-container">
+                    <canvas id="ltvChart"></canvas>
+                </div>
+                <div class="explanation-box">
+                    <strong>Calculation:</strong> At $7.99/mo subscription, LTV = $7.99 / churn rate. At 5% churn = $160 LTV. At 20% churn = $40 LTV. We estimate actual churn is 15-20% based on engagement data.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>LTV/CAC Analysis <span class="tooltip info-icon" data-tip="LTV:CAC ratio measures how much value you get vs. what you pay to acquire a customer. 3:1 is minimum viable, 5:1+ is good, 10:1+ is excellent.">?</span></h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Churn</th>
+                            <th>LTV</th>
+                            <th>LTV:CAC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Optimistic</td>
+                            <td>5%/mo</td>
+                            <td style="color: var(--success);">$160</td>
+                            <td><span class="badge badge-success">32-80x</span></td>
+                        </tr>
+                        <tr>
+                            <td>Base</td>
+                            <td>10%/mo</td>
+                            <td>$80</td>
+                            <td><span class="badge badge-success">16-40x</span></td>
+                        </tr>
+                        <tr>
+                            <td>Pessimistic</td>
+                            <td>20%/mo</td>
+                            <td style="color: var(--warning);">$40</td>
+                            <td><span class="badge badge-warning">8-20x</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="explanation-box">
+                    <strong>Why these ratios look good:</strong> Organic acquisition (Instagram/TikTok) means CAC is only $2-5. Even with high churn, LTV:CAC ratios are acceptable. But this breaks if they need to scale via paid acquisition.
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="margin-top: 30px; margin-bottom: 15px;">Sell Now Revenue Model Options</h3>
+        <div class="model-comparison">
+            <div class="model-card">
+                <h4>Lead Gen</h4>
+                <div class="model-stat tooltip" data-tip="No inventory to buy, just connect users with dealers and take a referral fee.">Capital: <strong>$0</strong></div>
+                <div class="model-stat">Monthly Rev: <strong>$1-5K</strong></div>
+                <div class="model-stat">Margin: <strong style="color: var(--success);">90%+</strong></div>
+                <div class="model-stat">Risk: <strong style="color: var(--success);">Low</strong></div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">Connect users to dealers for referral fees</p>
+            </div>
+            <div class="model-card">
+                <h4>Consignment</h4>
+                <div class="model-stat tooltip" data-tip="Partner with grading/resale service. User ships card, partner grades and sells, Pack Magik takes a cut.">Capital: <strong>$10-50K</strong></div>
+                <div class="model-stat">Monthly Rev: <strong>$5-25K</strong></div>
+                <div class="model-stat">Margin: <strong>70-80%</strong></div>
+                <div class="model-stat">Risk: <strong style="color: var(--warning);">Medium</strong></div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">Partner handles grading/sale, take commission</p>
+            </div>
+            <div class="model-card recommended">
+                <span class="badge badge-success" style="margin-bottom: 8px;">Recommended</span>
+                <h4>Hybrid</h4>
+                <div class="model-stat tooltip" data-tip="Mix of lead-gen and limited instant-buy for proven high-accuracy card types. Lower risk than full instant-buy.">Capital: <strong>$25-75K</strong></div>
+                <div class="model-stat">Monthly Rev: <strong>$8-20K</strong></div>
+                <div class="model-stat">Margin: <strong>50-65%</strong></div>
+                <div class="model-stat">Risk: <strong style="color: var(--warning);">Medium</strong></div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">Lead-gen + limited instant-buy on high-confidence cards</p>
+            </div>
+            <div class="model-card">
+                <h4>Instant Buy</h4>
+                <div class="model-stat tooltip" data-tip="Pack Magik buys cards directly at AI-predicted value. Highest risk: if AI is wrong, you lose money on every transaction. Adverse selection also hurts margins.">Capital: <strong style="color: var(--danger);">$100-250K</strong></div>
+                <div class="model-stat">Monthly Rev: <strong>$10-80K</strong></div>
+                <div class="model-stat">Margin: <strong>15-55%</strong></div>
+                <div class="model-stat">Risk: <strong style="color: var(--danger);">High ⚠️</strong></div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">Buy cards directly—requires validated AI</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Risk Register -->
+    <div class="slide" id="slide-7">
+        <h2>⚠️ Risk Register</h2>
+        <p class="subtitle">Quantified risk scenarios and expected losses</p>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Risk Probability × Impact <span class="tooltip info-icon" data-tip="Scatter plot showing risks by probability (x-axis) and impact (y-axis). Top-right = highest priority risks to address.">?</span></h3>
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Expected Loss per $1K Buyback <span class="tooltip info-icon" data-tip="If Pack Magik deployed $1,000 in instant buybacks, how much would they expect to lose to each risk factor? Based on survey data and AI prediction patterns.">?</span></h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Risk Factor</th>
+                            <th>Expected Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tooltip" data-tip="When AI predicts PSA 10 but card comes back as PSA 9 or lower. The price difference can be 30-50% on high-value cards.">AI False Positives (10→9)</td>
+                            <td style="color: var(--danger);">$200-600</td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Users only accept offers on cards where they think they're getting a great deal. Pack Magik buys overpriced inventory.">Adverse Selection</td>
+                            <td style="color: var(--warning);">$100-200</td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Risk of purchasing counterfeit or altered cards that have no resale value.">Counterfeit/Fraud</td>
+                            <td style="color: var(--warning);">$10-30</td>
+                        </tr>
+                        <tr>
+                            <td class="tooltip" data-tip="Card values can move during the 4-12 week grading period. If market drops, inventory loses value.">Market Movement</td>
+                            <td>$50-150</td>
+                        </tr>
+                        <tr style="background: var(--bg-card-hover);">
+                            <td><strong>Total Expected Loss</strong></td>
+                            <td style="color: var(--danger);"><strong>~$580 per $1K</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="explanation-box">
+                    <strong>Bottom line:</strong> Instant buyback loses money until AI accuracy exceeds ~65%. Current accuracy is unknown.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 20px;">
+            <h3>Risk Severity Assessment</h3>
+            <div class="risk-item">
+                <span class="risk-label tooltip" data-tip="Without validation data, we don't know if the core product works. This affects both user trust and Sell Now viability.">AI Accuracy Unknown</span>
+                <div class="risk-bar">
+                    <div class="risk-fill" style="width: 90%; background: var(--danger);"></div>
+                </div>
+                <span class="badge badge-danger">Critical</span>
+            </div>
+            <div class="risk-item">
+                <span class="risk-label tooltip" data-tip="Users rationally sell when offers are generous. Pack Magik would systematically overpay.">Adverse Selection in Sell Now</span>
+                <div class="risk-bar">
+                    <div class="risk-fill" style="width: 80%; background: var(--danger);"></div>
+                </div>
+                <span class="badge badge-danger">High</span>
+            </div>
+            <div class="risk-item">
+                <span class="risk-label tooltip" data-tip="PSA acquired Genamint (AI platform). Could build competing tools with instant distribution.">PSA Competitive Entry</span>
+                <div class="risk-bar">
+                    <div class="risk-fill" style="width: 70%; background: var(--warning);"></div>
+                </div>
+                <span class="badge badge-warning">Medium-High</span>
+            </div>
+            <div class="risk-item">
+                <span class="risk-label tooltip" data-tip="Pokemon card market is cyclical. A downturn reduces grading activity and demand for tools.">Market Cyclicality</span>
+                <div class="risk-bar">
+                    <div class="risk-fill" style="width: 50%; background: var(--warning);"></div>
+                </div>
+                <span class="badge badge-warning">Medium</span>
+            </div>
+            <div class="risk-item">
+                <span class="risk-label tooltip" data-tip="65% of users never grade a card. D7 retention below benchmarks. Users try but don't stick.">Shallow Engagement/Retention</span>
+                <div class="risk-bar">
+                    <div class="risk-fill" style="width: 60%; background: var(--warning);"></div>
+                </div>
+                <span class="badge badge-warning">Medium</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Valuation & Recommendation -->
+    <div class="slide" id="slide-8">
+        <h2>📊 Valuation & Recommendation</h2>
+        <p class="subtitle">Scenario analysis and investment decision framework</p>
+        
+        <div class="card" style="margin-bottom: 25px;">
+            <h3>Year 3 Revenue Scenarios</h3>
+            <div class="chart-container" style="height: 220px;">
+                <canvas id="valuationChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="grid grid-3">
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--danger);">Bear Case</h3>
+                <div class="metric-value" style="font-size: 2rem;">$2.5M</div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">$820K ARR @ 3x multiple</p>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                    High churn, AI issues unresolved, Sell Now is lead-gen only
+                </p>
+            </div>
+            <div class="card" style="text-align: center; border-color: var(--accent);">
+                <h3 style="color: var(--accent);">Base Case</h3>
+                <div class="metric-value" style="font-size: 2rem; color: var(--accent);">$17M</div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">$3.4M ARR @ 5x multiple</p>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                    Moderate retention, validated AI, consignment model works
+                </p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--success);">Bull Case</h3>
+                <div class="metric-value" style="font-size: 2rem;">$88M</div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">$11M ARR @ 8x multiple</p>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                    Strong retention, hybrid Sell Now, expansion to other TCGs
+                </p>
+            </div>
+        </div>
+        
+        <div class="final-verdict">
+            <h2>🟡 Conditional Pass</h2>
+            <p style="font-size: 1rem; max-width: 700px; margin: 0 auto 20px auto; color: var(--text-muted);">
+                The product solves a real problem with efficient acquisition. But the two things that matter most—<strong>AI accuracy</strong> and <strong>retention</strong>—are unvalidated. Request these before proceeding.
+            </p>
+            <div class="action-items">
+                <div class="action-item">
+                    <span class="action-number">1</span>
+                    <div>
+                        <strong>Request AI Backtest</strong>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">500+ cards with predicted vs actual PSA/BGS grades</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-number">2</span>
+                    <div>
+                        <strong>Request Subscription Metrics</strong>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Current paying subs, MRR, churn rate by cohort</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-number">3</span>
+                    <div>
+                        <strong>Request Sell Now Pilot Data</strong>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Actual completed transactions, not just survey clicks</p>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <span class="action-number">4</span>
+                    <div>
+                        <strong>Price Conservatively</strong>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">$3-5M pre-money max until gaps are validated</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-dot active" onclick="goToSlide(1)" title="Executive Summary"></div>
+        <div class="nav-dot" onclick="goToSlide(2)" title="User Analytics"></div>
+        <div class="nav-dot" onclick="goToSlide(3)" title="Sell Now Analysis"></div>
+        <div class="nav-dot" onclick="goToSlide(4)" title="AI Validation"></div>
+        <div class="nav-dot" onclick="goToSlide(5)" title="Market Analysis"></div>
+        <div class="nav-dot" onclick="goToSlide(6)" title="Unit Economics"></div>
+        <div class="nav-dot" onclick="goToSlide(7)" title="Risk Register"></div>
+        <div class="nav-dot" onclick="goToSlide(8)" title="Recommendation"></div>
+    </div>
+    
+    <div class="nav-arrows">
+        <button class="nav-arrow" onclick="prevSlide()" title="Previous slide (←)">←</button>
+        <button class="nav-arrow" onclick="nextSlide()" title="Next slide (→)">→</button>
+    </div>
+    
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / 8
+    </div>
+    
+    <div class="slide-title" id="slideTitle">Executive Summary</div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+        const slideTitles = [
+            'Executive Summary',
+            'User Analytics', 
+            'Sell Now Analysis',
+            'AI Validation',
+            'Market Analysis',
+            'Unit Economics',
+            'Risk Register',
+            'Recommendation'
+        ];
+        
+        function goToSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+            
+            document.getElementById(`slide-${n}`).classList.add('active');
+            document.querySelectorAll('.nav-dot')[n-1].classList.add('active');
+            document.getElementById('currentSlide').textContent = n;
+            document.getElementById('slideTitle').textContent = slideTitles[n-1];
+            
+            currentSlide = n;
+            setTimeout(initCharts, 100);
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) goToSlide(currentSlide - 1);
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+        
+        // Charts
+        function initCharts() {
+            const engagementCtx = document.getElementById('engagementChart');
+            if (engagementCtx && !engagementCtx.chart) {
+                engagementCtx.chart = new Chart(engagementCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Never Graded (65.5%)', '1-9 Grades (31.1%)', '10-49 Grades (3.0%)', '50+ Grades (0.3%)'],
+                        datasets: [{
+                            data: [7729, 3672, 358, 38],
+                            backgroundColor: ['#ef4444', '#f59e0b', '#6366f1', '#10b981'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 12, font: { size: 11 } } }
+                        }
+                    }
+                });
+            }
+            
+            const retentionCtx = document.getElementById('retentionChart');
+            if (retentionCtx && !retentionCtx.chart) {
+                retentionCtx.chart = new Chart(retentionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['D1', 'D7', 'D14', 'D30', 'D60', 'D90'],
+                        datasets: [{
+                            label: 'Pack Magik',
+                            data: [100, 28.7, 25, 22.8, 20, 19],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Benchmark',
+                            data: [100, 40, 35, 30, 27, 25],
+                            borderColor: '#10b981',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                            x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { labels: { color: '#94a3b8' } } }
+                    }
+                });
+            }
+            
+            const multiplierCtx = document.getElementById('multiplierChart');
+            if (multiplierCtx && !multiplierCtx.chart) {
+                multiplierCtx.chart = new Chart(multiplierCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['<75%', '75-100%', '100-125%', '>125%'],
+                        datasets: [{
+                            label: 'Accept Rate',
+                            data: [5.2, 3.9, 6.2, 9.2],
+                            backgroundColor: ['#ef4444', '#f59e0b', '#6366f1', '#10b981']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, max: 12, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', callback: v => v + '%' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            
+            const responseCtx = document.getElementById('responseChart');
+            if (responseCtx && !responseCtx.chart) {
+                responseCtx.chart = new Chart(responseCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Dismissed (69.6%)', 'Declined (24.2%)', 'Accepted (6.2%)'],
+                        datasets: [{ data: [666, 232, 59], backgroundColor: ['#64748b', '#f59e0b', '#10b981'], borderWidth: 0 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } }
+                    }
+                });
+            }
+            
+            const gradeDistCtx = document.getElementById('gradeDistChart');
+            if (gradeDistCtx && !gradeDistCtx.chart) {
+                gradeDistCtx.chart = new Chart(gradeDistCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['PSA 1-7', 'PSA 8', 'PSA 8.5', 'PSA 9', 'PSA 10'],
+                        datasets: [{ label: 'Cards', data: [33, 16, 32, 234, 635], backgroundColor: ['#64748b', '#f59e0b', '#f59e0b', '#6366f1', '#ef4444'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            
+            const marketCtx = document.getElementById('marketChart');
+            if (marketCtx && !marketCtx.chart) {
+                marketCtx.chart = new Chart(marketCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['TAM', 'SAM', 'SOM (Y5)'],
+                        datasets: [{ label: 'Market Size ($M)', data: [90, 10, 5], backgroundColor: ['#6366f1', '#818cf8', '#10b981'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', callback: v => '$' + v + 'M' } },
+                            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            
+            const acquisitionCtx = document.getElementById('acquisitionChart');
+            if (acquisitionCtx && !acquisitionCtx.chart) {
+                acquisitionCtx.chart = new Chart(acquisitionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Instagram (40%)', 'TikTok (19%)', 'Friend (11%)', 'YouTube (8%)', 'Google (5%)', 'Other (17%)'],
+                        datasets: [{ data: [40, 19, 11, 8, 5, 17], backgroundColor: ['#e1306c', '#25F4EE', '#10b981', '#ff0000', '#4285f4', '#64748b'], borderWidth: 0 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { color: '#94a3b8', padding: 8, font: { size: 11 } } } }
+                    }
+                });
+            }
+            
+            const ltvCtx = document.getElementById('ltvChart');
+            if (ltvCtx && !ltvCtx.chart) {
+                ltvCtx.chart = new Chart(ltvCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['5% Churn', '10% Churn', '15% Churn', '20% Churn'],
+                        datasets: [{ label: 'LTV', data: [160, 80, 53, 40], backgroundColor: ['#10b981', '#6366f1', '#f59e0b', '#ef4444'] }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', callback: v => '$' + v } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+            
+            const riskCtx = document.getElementById('riskChart');
+            if (riskCtx && !riskCtx.chart) {
+                riskCtx.chart = new Chart(riskCtx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: 'AI Accuracy',
+                            data: [{ x: 75, y: 90, r: 20 }],
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                        }, {
+                            label: 'Adverse Selection',
+                            data: [{ x: 85, y: 80, r: 18 }],
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                        }, {
+                            label: 'PSA Competition',
+                            data: [{ x: 30, y: 95, r: 15 }],
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)'
+                        }, {
+                            label: 'Market Crash',
+                            data: [{ x: 50, y: 60, r: 12 }],
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)'
+                        }, {
+                            label: 'Retention',
+                            data: [{ x: 65, y: 55, r: 12 }],
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, max: 100, title: { display: true, text: 'Impact →', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                            x: { beginAtZero: true, max: 100, title: { display: true, text: 'Probability →', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } }
+                    }
+                });
+            }
+            
+            const valuationCtx = document.getElementById('valuationChart');
+            if (valuationCtx && !valuationCtx.chart) {
+                valuationCtx.chart = new Chart(valuationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Bear', 'Base', 'Bull'],
+                        datasets: [{
+                            label: 'Y3 ARR ($M)',
+                            data: [0.82, 3.4, 11],
+                            backgroundColor: ['#ef4444', '#6366f1', '#10b981']
+                        }, {
+                            label: 'Implied Value ($M)',
+                            data: [2.5, 17, 88],
+                            backgroundColor: ['rgba(239, 68, 68, 0.3)', 'rgba(99, 102, 241, 0.3)', 'rgba(16, 185, 129, 0.3)']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', callback: v => '$' + v + 'M' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        },
+                        plugins: { legend: { labels: { color: '#94a3b8' } } }
+                    }
+                });
+            }
+        }
+        
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
